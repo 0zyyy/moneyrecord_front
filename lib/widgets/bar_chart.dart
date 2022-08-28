@@ -1,11 +1,18 @@
+import 'dart:math';
+
+import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class ExpensesChart extends StatefulWidget {
   final List<String> tooltipWeeks;
   final List<String> weeks;
-  const ExpensesChart(
-      {Key? key, required this.tooltipWeeks, required this.weeks})
+  final List<double> weeksValue;
+  ExpensesChart(
+      {Key? key,
+      required this.tooltipWeeks,
+      required this.weeks,
+      required this.weeksValue})
       : super(key: key);
 
   @override
@@ -15,7 +22,6 @@ class ExpensesChart extends StatefulWidget {
 class ExpensesChartState extends State<ExpensesChart> {
   final Color leftBarColor = const Color(0xff53fdd7);
   final double width = 20;
-
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
 
@@ -24,24 +30,11 @@ class ExpensesChartState extends State<ExpensesChart> {
   @override
   void initState() {
     super.initState();
-    final barGroup1 = makeGroupData(0, 5);
-    final barGroup2 = makeGroupData(1, 16);
-    final barGroup3 = makeGroupData(2, 18);
-    final barGroup4 = makeGroupData(3, 20);
-    final barGroup5 = makeGroupData(4, 17);
-    final barGroup6 = makeGroupData(5, 19);
-    final barGroup7 = makeGroupData(6, 10);
-
-    final items = [
-      barGroup1,
-      barGroup2,
-      barGroup3,
-      barGroup4,
-      barGroup5,
-      barGroup6,
-      barGroup7,
-    ];
-
+    final items = widget.weeksValue
+        .mapIndexed((index, element) => element == 0.0
+            ? makeGroupData(index, 0)
+            : makeGroupData(index, element))
+        .toList();
     rawBarGroups = items;
 
     showingBarGroups = rawBarGroups;
@@ -191,11 +184,11 @@ class ExpensesChartState extends State<ExpensesChart> {
     );
     String text;
     if (value == 0) {
-      text = '1K';
+      text = '${widget.weeksValue.min}K';
     } else if (value == 10) {
       text = '5K';
-    } else if (value == 19) {
-      text = '10K';
+    } else if (value == 20) {
+      text = '${widget.weeksValue.max / 100}K';
     } else {
       return Container();
     }
@@ -231,53 +224,5 @@ class ExpensesChartState extends State<ExpensesChart> {
         width: width,
       ),
     ]);
-  }
-
-  Widget makeTransactionsIcon() {
-    const width = 4.5;
-    const space = 3.5;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          width: width,
-          height: 10,
-          color: Colors.white.withOpacity(0.4),
-        ),
-        const SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 28,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        const SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 42,
-          color: Colors.white.withOpacity(1),
-        ),
-        const SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 28,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        const SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 10,
-          color: Colors.white.withOpacity(0.4),
-        ),
-      ],
-    );
   }
 }

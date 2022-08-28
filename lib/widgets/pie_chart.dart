@@ -4,13 +4,17 @@ import 'package:untitled/utils/app_color.dart';
 import 'package:untitled/widgets/indicator.dart';
 
 class PieChartExpenses extends StatefulWidget {
-  const PieChartExpenses({Key? key}) : super(key: key);
+  final double income;
+  final double outcome;
+  const PieChartExpenses(
+      {Key? key, required this.income, required this.outcome})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => PieChartExpensesState();
 }
 
-class PieChartExpensesState extends State {
+class PieChartExpensesState extends State<PieChartExpenses> {
   int touchedIndex = -1;
 
   @override
@@ -19,10 +23,10 @@ class PieChartExpensesState extends State {
       aspectRatio: 1.3,
       child: Card(
         color: AppColor.bgColor1,
-        margin: EdgeInsets.only(left: 16,top: 16),
+        margin: EdgeInsets.only(left: 16, top: 16),
         child: Row(
           children: <Widget>[
-           const SizedBox(
+            const SizedBox(
               width: 30,
             ),
             Expanded(
@@ -48,7 +52,7 @@ class PieChartExpensesState extends State {
                       ),
                       sectionsSpace: 0,
                       centerSpaceRadius: 40,
-                      sections: showingSections()),
+                      sections: showingSections(widget.income, widget.outcome)),
                 ),
               ),
             ),
@@ -70,7 +74,9 @@ class PieChartExpensesState extends State {
                   text: 'Bulan kemarin',
                   isSquare: true,
                 ),
-                SizedBox(height: 20,)
+                SizedBox(
+                  height: 20,
+                )
               ],
             ),
             const SizedBox(
@@ -82,7 +88,7 @@ class PieChartExpensesState extends State {
     );
   }
 
-  List<PieChartSectionData> showingSections() {
+  List<PieChartSectionData> showingSections(double income, double outcome) {
     return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
@@ -91,8 +97,8 @@ class PieChartExpensesState extends State {
         case 0:
           return PieChartSectionData(
             color: AppColor.primaryColor,
-            value: 70,
-            title: '70%',
+            value: income == 0.0 ? 50 : income / 1000,
+            title: '${income / 1000}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -102,8 +108,8 @@ class PieChartExpensesState extends State {
         case 1:
           return PieChartSectionData(
             color: AppColor.secondaryColor,
-            value: 30,
-            title: '30%',
+            value: outcome == 0.0 ? 50 : outcome / 1000,
+            title: '${outcome / 1000}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,

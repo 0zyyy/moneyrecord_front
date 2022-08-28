@@ -8,13 +8,15 @@ class FormWidget extends StatefulWidget {
   final TextEditingController controller;
   final double border;
   final String label;
+  final bool hideIcon;
   const FormWidget(
       {Key? key,
       required this.text,
       this.hideText = false,
       required this.controller,
       this.border = 30,
-      required this.label})
+      required this.label,
+      this.hideIcon = true})
       : super(key: key);
 
   @override
@@ -45,9 +47,9 @@ class _FormWidgetState extends State<FormWidget> {
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: AppFont.secondaryTextStyle,
-        suffixIcon: Icon(Icons.add),
+        suffixIcon: widget.hideIcon ? SizedBox() : Icon(Icons.add),
         filled: true,
-        fillColor: AppColor.secondary,
+        fillColor: AppColor.bgNavBar,
         contentPadding: const EdgeInsets.all(20),
         hintText: widget.text,
         hintStyle: const TextStyle(color: Colors.grey),

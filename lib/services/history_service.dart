@@ -1,14 +1,16 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:untitled/utils/app_api.dart';
 import 'package:untitled/utils/app_request.dart';
 
 class HistoryService {
-  static History(int idUser) async {
+  static History(int idUser, String token) async {
     try {
       Map? response = await AppRequest.post(
-          'http://192.168.0.23:8080/api/v1/search/history',
-          jsonEncode({"id_user": idUser, "date": ""}));
+          '${ApiClient.baseUrl}/api/v1/search/history',
+          jsonEncode({"id_user": idUser, "date": ""}),
+          headers: {"Authorization": "Bearer ${token}"});
       print(response);
 
       return response;
@@ -17,11 +19,15 @@ class HistoryService {
     }
   }
 
-  static Future<Map?> Analysis(int idUser) async {
+  static Future<Map?> Analysis(int idUser, String token) async {
     try {
       Map? response = await AppRequest.post(
-          'http://192.168.0.23:8080/api/v1/anal',
-          jsonEncode({"id_user": idUser, "date": "2022-06-21"}));
+          '${ApiClient.baseUrl}/api/v1/anal',
+          jsonEncode({
+            "id_user": idUser,
+            "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          }),
+          headers: {"Authorization": "Bearer " + token});
       if (response == null) {
         return {
           "meta": {
@@ -40,6 +46,28 @@ class HistoryService {
       return response;
     } catch (e) {
       print(e);
+    }
+  }
+
+  static Future<bool> addHistory(int idUser, String token) async {
+    try {
+      Map? response = await AppRequest.post(
+          '${ApiClient.baseUrl}/api/v1/history',
+          jsonEncode({
+            "id_user": idUser,
+            "type": "Pengeluaran",
+            "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+            "total": "100000",
+            "details": '{"kimchi": "100000"}'
+          }),
+          headers: {"Authorization": "Bearer " + token});
+      if (response!["meta"]["status"] == 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 }

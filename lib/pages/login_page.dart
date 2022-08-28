@@ -6,6 +6,7 @@ import 'package:untitled/services/user_service.dart';
 import 'package:untitled/utils/app_asset.dart';
 import 'package:untitled/utils/app_color.dart';
 import 'package:untitled/utils/session.dart';
+import 'package:untitled/widgets/loading_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -15,20 +16,30 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool isLoading = false;
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   login() async {
     Map? response =
         await UserService.Login(emailController.text, passController.text);
-    String msg = response == null ? '' : response["data"]["message"];
+    String msg = response?["meta"]["message"] == null
+        ? ''
+        : response!["meta"]["message"];
     if (msg == '') {
       Get.snackbar("Ada kesalahan", "Terjadi kesalahan pada server");
     } else if (response?["meta"]["code"] == 200) {
-      // print(response!["data"]);
       response?["data"]["id_user"] = response?["data"]["id_user"].toString();
       Session.saveUser(User.fromJson(response?["data"]));
-      Get.toNamed("/home");
+      setState(() {
+        isLoading = !isLoading;
+      });
+      Future.delayed(Duration(seconds: 2), () {
+        Get.toNamed('home');
+        setState(() {
+          isLoading = !isLoading;
+        });
+      });
     } else if (response!["meta"]["code"] == 422) {
       Get.snackbar(msg, "Username atau password salah",
           backgroundColor: Colors.redAccent);
@@ -111,25 +122,27 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             height: 20,
                           ),
-                          Material(
-                            color: AppColor.primary,
-                            borderRadius: BorderRadius.circular(30),
-                            child: InkWell(
-                              onTap: () => login(),
-                              borderRadius: BorderRadius.circular(30),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 16),
-                                child: Text(
-                                  'LOGIN',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                          isLoading
+                              ? LoadingButton()
+                              : Material(
+                                  color: AppColor.primary,
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: InkWell(
+                                    onTap: () => login(),
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 40, vertical: 16),
+                                      child: Text(
+                                        'LOGIN',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),

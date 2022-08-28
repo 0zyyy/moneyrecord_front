@@ -7,7 +7,7 @@ class AppColor {
   static const chart = Color(0XFFA3D8F4);
   static const primaryColor = Color(0xFF6C5ECF);
   static const secondaryColor = Color(0xFF38ABBE);
-  static const alerColor = Color(0xFFED6363);
+  static const alertColor = Color(0xFFED6363);
   static const priceColor = Color(0xFF2C96F1);
   static const bgColor1 = Color(0xFF1F1D2B);
   static const bgColor2 = Color(0xFF2B2937);

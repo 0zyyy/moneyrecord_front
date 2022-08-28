@@ -9,6 +9,7 @@ class HomeController extends GetxController {
   final _todayPercent = ''.obs;
 
   String get todayPercent => _todayPercent.value;
+
   final _week = [
     0.0,
     0.0,
@@ -18,6 +19,7 @@ class HomeController extends GetxController {
     0.0,
     0.0,
   ].obs;
+  List<double> get week => _week.value;
   List<String> get days => ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
   List<String> get toolTipWeek =>
       ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
@@ -62,12 +64,14 @@ class HomeController extends GetxController {
   final _differentMonth = 0.0.obs;
   double get differentMonth => _differentMonth.value;
 
-  getAnalysis(String idUser) async {
-    Map? data = await HistoryService.Analysis(int.parse(idUser));
+  getAnalysis(String idUser, String token) async {
+    Map? data = await HistoryService.Analysis(int.parse(idUser), token);
 
     // today outcome
-    _today.value = data!["data"]['today'].toDouble();
-    double yesterday = data["data"]['yesterday'].toDouble();
+    _today.value =
+        data?["data"] == null ? 0.0 : data!["data"]['today'].toDouble();
+    double yesterday =
+        data?["data"] == null ? 0.0 : data!["data"]['yesterday'].toDouble();
     double different = (today - yesterday).abs();
     bool isSame = today.isEqual(yesterday);
     bool isPlus = today.isGreaterThan(yesterday);
@@ -78,11 +82,14 @@ class HomeController extends GetxController {
         : isPlus
             ? '+${percent.toStringAsFixed(1)}% dibanding kemarin'
             : '-${percent.toStringAsFixed(1)}% dibanding kemarin';
-
-    _week.value = List.castFrom(data['week'].map((e) => e.toDouble()).toList());
-
-    _monthIncome.value = data["data"]['month']['income'].toDouble();
-    _monthOutcome.value = data["data"]['month']['outcome'].toDouble();
+    _week.value =
+        List.castFrom(data!["data"]['week'].map((e) => e.toDouble()).toList());
+    _monthIncome.value = data?["data"] == null
+        ? 0.0
+        : data!["data"]['month']['income'].toDouble();
+    _monthOutcome.value = data?["data"] == null
+        ? 0.0
+        : data!["data"]['month']['outcome'].toDouble();
     _differentMonth.value = (monthIncome - monthOutcome).abs();
     bool isSameMonth = monthIncome.isEqual(monthOutcome);
     bool isPlusMonth = monthIncome.isGreaterThan(monthOutcome);
@@ -95,5 +102,6 @@ class HomeController extends GetxController {
         : isPlusMonth
             ? 'Pemasukan\nlebih besar $percentIncome%\ndari Pengeluaran'
             : 'Pemasukan\nlebih kecil $percentIncome%\ndari Pengeluaran';
+    update();
   }
 }

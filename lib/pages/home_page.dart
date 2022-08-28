@@ -26,9 +26,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    cHome.getAnalysis(cUser.user.idUser!);
-    print(cHome.weekText());
-    print(cHome.tooltipWeekText());
+    cHome.getAnalysis(cUser.user.idUser!, cUser.user.token!);
+    // print(cHome.weekText());
+    // print(cHome.tooltipWeekText());
   }
 
   Widget menuItem(String text) {
@@ -67,10 +67,18 @@ class _HomePageState extends State<HomePage> {
             style: AppFont.primaryTextStyle
                 .copyWith(fontSize: 16, fontWeight: FontWeight.w500),
           ),
-          GestureDetector(onTap: () {}, child: menuItem('Tambah Baru')),
+          GestureDetector(
+              onTap: () {
+                Get.toNamed("/tambah");
+              },
+              child: menuItem('Tambah Baru')),
           menuItem('Pemasukan'),
           menuItem('Pengeluaran'),
-          menuItem('Riwayat'),
+          GestureDetector(
+              onTap: () {
+                Get.toNamed("/history");
+              },
+              child: menuItem('Riwayat')),
           SizedBox(
             height: 20,
           ),
@@ -191,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                       bottomLeft: Radius.circular(10))),
               child: GestureDetector(
                 onTap: () {
-                  Get.snackbar("Blm", "implemnt");
+                  Get.toNamed("/history");
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -222,6 +230,24 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    Widget pieChartTitle() {
+      return Container(
+        margin: EdgeInsets.only(left: 16, top: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Perbandingan bulan lalu dengan sekarang',
+              style: AppFont.primaryTextStyle.copyWith(fontSize: 16),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColor.bgColor1,
       endDrawer: Drawer(
@@ -238,12 +264,19 @@ class _HomePageState extends State<HomePage> {
             expensesNowTitle(),
             expensesNow(),
             barChartTitle(),
-            ExpensesChart(
-              tooltipWeeks: cHome.tooltipWeekText(),
-              weeks: cHome.weekText(),
-            ),
-            barChartTitle(),
-            PieChartExpenses(),
+            GetBuilder<HomeController>(builder: (context) {
+              return ExpensesChart(
+                  tooltipWeeks: cHome.tooltipWeekText(),
+                  weeks: cHome.weekText(),
+                  weeksValue: cHome.week);
+            }),
+            pieChartTitle(),
+            GetBuilder<HomeController>(builder: (context) {
+              return PieChartExpenses(
+                income: context.monthIncome,
+                outcome: context.monthOutcome,
+              );
+            }),
           ],
         ),
       ),
